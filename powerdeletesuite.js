@@ -1,5 +1,5 @@
 var pd = {
-  version: "1.4.11",
+  version: "1.4.12",
   bookmarkver: "1.4",
   editStrings: [
     "I love ice cream.",
@@ -896,7 +896,7 @@ var pd = {
         }).then(
           function (xhr) {
             pd.task.items[0].pdDeleted = true;
-            const delay = handleRateLimit(xhr);
+            const delay = pd.helpers.handleRateLimit(xhr);
             if (delay > 0) {
               setTimeout(() => {
                 pd.actions.children.handleSingle();
@@ -945,7 +945,7 @@ var pd = {
         }).then(
           function (xhr) {
             pd.task.items[0].pdEdited = true;
-            const delay = handleRateLimit(xhr);
+            const delay = pd.helpers.handleRateLimit(xhr);
             if (delay > 0) {
               setTimeout(() => {
                 pd.actions.children.handleSingle();
