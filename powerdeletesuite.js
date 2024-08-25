@@ -883,85 +883,95 @@ var pd = {
       },
     },
     delete: function (item) {
-      setTimeout(() => {
-        if (pd.performActions) {
-          $.ajax({
-            url: "/api/del",
-            method: "post",
-            data: {
-              id: item.data.name,
-              executed: "deleted",
-              uh: pd.config.uh,
-              renderstyle: "html",
-            },
-          }).then(
-            function () {
-              pd.task.items[0].pdDeleted = true;
-              pd.actions.children.handleSingle();
-            },
-            function () {
-              pd.task.info.errors++;
-              if (
-                confirm(
-                  "Error deleting " +
-                    (item.kind == "t3" ? "post" : "comment") +
-                    ", would you like to retry?"
-                )
-              ) {
+      if (pd.performActions) {
+        $.ajax({
+          url: "/api/del",
+          method: "post",
+          data: {
+            id: item.data.name,
+            executed: "deleted",
+            uh: pd.config.uh,
+            renderstyle: "html",
+          },
+        }).then(
+          function (xhr) {
+            pd.task.items[0].pdDeleted = true;
+            const delay = handleRateLimit(xhr);
+            if (delay > 0) {
+              setTimeout(() => {
                 pd.actions.children.handleSingle();
-              } else {
-                pd.actions.children.finishItem();
-                pd.actions.children.handleGroup();
-              }
+              }, delay);
+            } else {
+              pd.actions.children.handleSingle();
             }
-          );
-        } else {
-          pd.task.items[0].pdDeleted = true;
-          pd.task.after = pd.task.items[0].data.name;
-          pd.actions.children.handleSingle();
-        }
-      }, 5000);
+          },
+          function () {
+            pd.task.info.errors++;
+            if (
+              confirm(
+                "Error deleting " +
+                (item.kind == "t3" ? "post" : "comment") +
+                ", would you like to retry?"
+              )
+            ) {
+              pd.actions.children.handleSingle();
+            } else {
+              pd.actions.children.finishItem();
+              pd.actions.children.handleGroup();
+            }
+          }
+        );
+      } else {
+        pd.task.items[0].pdDeleted = true;
+        pd.task.after = pd.task.items[0].data.name;
+        pd.actions.children.handleSingle();
+      }
     },
     edit: function (item) {
-      setTimeout(() => {
-        if (pd.performActions) {
-          var editString = pd.task.config.editText ||
-            pd.editStrings[Math.floor(Math.random() * pd.editStrings.length)];
-          $.ajax({
-            url: "/api/editusertext",
-            method: "post",
-            data: {
-              thing_id: item.data.name,
-              text: editString,
-              id: "#form-" + item.data.name,
-              r: item.data.subreddit,
-              uh: pd.config.uh,
-              renderstyle: "html",
-            },
-          }).then(
-            function () {
-              pd.task.items[0].pdEdited = true;
-              pd.actions.children.handleSingle();
-            },
-            function () {
-              pd.task.info.errors++;
-              if (
-                !confirm(
-                  "Error editing " +
-                    (item.kind == "t3" ? "post" : "comment") +
-                    ", would you like to retry?"
-                )
-              ) {
-                item.pdEdited = true;
-              }
+      if (pd.performActions) {
+        var editString = pd.task.config.editText ||
+          pd.editStrings[Math.floor(Math.random() * pd.editStrings.length)];
+        $.ajax({
+          url: "/api/editusertext",
+          method: "post",
+          data: {
+            thing_id: item.data.name,
+            text: editString,
+            id: "#form-" + item.data.name,
+            r: item.data.subreddit,
+            uh: pd.config.uh,
+            renderstyle: "html",
+          },
+        }).then(
+          function (xhr) {
+            pd.task.items[0].pdEdited = true;
+            const delay = handleRateLimit(xhr);
+            if (delay > 0) {
+              setTimeout(() => {
+                pd.actions.children.handleSingle();
+              }, delay);
+            } else {
               pd.actions.children.handleSingle();
             }
-          );
-        } else {
-          pd.task.items[0].pdEdited = true;
-          pd.actions.children.handleSingle();
-        }
-      }, 5000);
+          },
+          function () {
+            pd.task.info.errors++;
+            if (
+              !confirm(
+                "Error editing " +
+                (item.kind == "t3" ? "post" : "comment") +
+                ", would you like to retry?"
+              )
+            ) {
+              item.pdEdited = true;
+            }
+            pd.actions.children.handleSingle();
+          }
+        );
+      } else {
+        pd.task.items[0].pdEdited = true;
+        pd.actions.children.handleSingle();
+      }
     },
   },
   ui: {
