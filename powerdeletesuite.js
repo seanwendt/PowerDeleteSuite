@@ -894,7 +894,7 @@ var pd = {
             renderstyle: "html",
           },
         }).then(
-          function (xhr) {
+          function (data, status, xhr) {
             pd.task.items[0].pdDeleted = true;
             const delay = pd.helpers.handleRateLimit(xhr);
             if (delay > 0) {
@@ -943,7 +943,7 @@ var pd = {
             renderstyle: "html",
           },
         }).then(
-          function (xhr) {
+          function (data, status, xhr) {
             pd.task.items[0].pdEdited = true;
             const delay = pd.helpers.handleRateLimit(xhr);
             if (delay > 0) {
