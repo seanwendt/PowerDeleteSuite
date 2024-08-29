@@ -627,7 +627,7 @@ var pd = {
       const remaining = parseFloat(xhr.getResponseHeader('X-Ratelimit-Remaining'));
       const reset = parseFloat(xhr.getResponseHeader('X-Ratelimit-Reset'));
       
-      if (remaining < 1) {
+      if (remaining < 2) {
         const delay = reset * 1000;  // Convert to milliseconds
         console.log(`Rate limit reached. Pausing for ${delay / 1000} seconds.`);
         return delay;
